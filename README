@@ -1,0 +1,41 @@
+
+STM32F407VGT6 breakout board baremetal examples.
+
+So if you google STM32 blue pill you find an inexpensive cortex-m3
+based board.  You google STM32 black pill you find a similar one.
+
+Well there is also a black board you find if you search for
+
+STM32F407VGT6 board
+
+on ebay or amazon.  I have been burned a few times on ebay now
+with empty shipments and no way to recover, amazon two to three times
+the price for the same board but already in the states your choice.
+
+This one says diymroe (diymore mispelled) on the top and DIY MORE
+on the bottom.  Website is bogus or doesnt work anymore.  Found
+the schematic on google searches and dumb luck.
+
+The button near the usb connector is reset.  On the other end of
+that side of the board, with the usb up the lower left, it says
+BOOT0BOOT1.  What is going on there is those pins on the side next
+to those labels the pair at the end of the row if you put a jumper
+across them that changes BOOT1.  Do that and press reset and then
+dmesg (-c) and you should see something like
+
+[431754.721749] usb 2-1.7.2: New USB device found, idVendor=0483, idProduct=df11
+[431754.721752] usb 2-1.7.2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+[431754.721755] usb 2-1.7.2: Product: STM32  BOOTLOADER
+[431754.721756] usb 2-1.7.2: Manufacturer: STMicroelectronics
+[431754.721758] usb 2-1.7.2: SerialNumber: 333333333333
+
+apt-get install dfu-util
+
+then you can do something like this
+
+dfu-util -a 0 -s 0x08000000 -D blinker00.bin
+
+Then move the jumper one set of pins over from the end and press reset
+that shorts BOOT0 (to ground) and now our program runs.  Ill get to
+serial loading (and jtag) later.
+
