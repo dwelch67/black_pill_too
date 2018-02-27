@@ -1,8 +1,13 @@
 
 STM32F407VGT6 breakout board baremetal examples.
 
-So if you google STM32 blue pill you find an inexpensive cortex-m3
-based board.  You google STM32 black pill you find a similar one.
+So if you google
+
+stm32 blue pill
+
+you find an inexpensive cortex-m3 based board.  You google STM32 black
+pill you find a similar one.  (This repo has ABSOLUTELY NOTHING to
+do with either one of those boards, nor anything maple or arduino)
 
 Well there is also a black board you find if you search for
 
@@ -16,12 +21,18 @@ This one says diymroe (diymore mispelled) on the top and DIY MORE
 on the bottom.  Website is bogus or doesnt work anymore.  Found
 the schematic on google searches and dumb luck.
 
-The button near the usb connector is reset.  On the other end of
-that side of the board, with the usb up the lower left, it says
-BOOT0BOOT1.  What is going on there is those pins on the side next
-to those labels the pair at the end of the row if you put a jumper
-across them that changes BOOT1.  Do that and press reset and then
-dmesg (-c) and you should see something like
+On the other end of the board away from the usb connector, one corner
+has another button and says diymroe, not that corner, but the other
+has silkscreen that says BOOT0BOOT1.  Those last to sets of pins
+on that reset button edge of the board are BOOT0 and BOOT1 and a
+ground.  See the black_ebay_board.png file to see the board that I am
+talking about.  I have marked the BOOT0 pin(s) in blue and the BOOT1
+in red.
+
+If you plug a two pin jumber across the BOOT1 pin(s), the ones I marked
+in red, to short BOOT1 to ground (ground being on the outer edge of the
+board BTW) and plug the board into your computer using a usb cable
+then you should see something like this with dmesg
 
 [431754.721749] usb 2-1.7.2: New USB device found, idVendor=0483, idProduct=df11
 [431754.721752] usb 2-1.7.2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
@@ -35,7 +46,65 @@ then you can do something like this
 
 dfu-util -a 0 -s 0x08000000 -D blinker00.bin
 
-Then move the jumper one set of pins over from the end and press reset
-that shorts BOOT0 (to ground) and now our program runs.  Ill get to
-serial loading (and jtag) later.
+Then move the jumper one set of pins over from the end, BOOT0 and GND
+I have marked as blue in the picture, and press reset, that will then
+run our program in flash.
+
+This implies that BOOT0 and BOOT1 float high when not shorted to ground.
+
+Documents you will need
+
+On the st.com website search for STM32F407VGT6, get the datasheet (currently
+shown as DS8626) and the reference manual as a minimum (currently shown
+as RM0090.  You can get the programming manual, and maybe it has some
+different information but the proper manuals are at ARMs website with
+respect to the cortex-m4 core, we know it is a cortex-m4 because we
+looked at the st documentation for this chip.
+
+We go to infocenter.arm.com then on the left we see cortex-m series
+processors (this as with all websites are subject to change), expand
+that.  See Cortex-M4, expand that see different revisions r0p1 for
+example is the most recent I see.  So expand that and see ARM
+Cortex-M4 Processor Technical Reference Manual.  Click on that go to the
+bottom and get the pdf version.  You might have to sacrifice an email
+address.
+
+Now the ARM TRM (technical reference manual) tells us this processor
+core conforms to the ARMV7-M architecture so we go back to the left side
+of that page, expand ARM Architecture.  Expand Reference Manuals, expand
+ARMv7-M Reference Manual.  Select ARMv7-M Architectural Reference
+Manual and download the pdf version.  Might have to give up an email
+address.  This is the ARM ARM (Architectural Reference Manual) at
+least for this architecture version.  Used to be only one ARM ARM
+now there are many.
+
+ARM makes IP/cores not chips, ST makes this chip, the processor is
+at the center but much of the logic around it is from ST or other ip
+vendors ST purchased ip from.  When you use a different cortex-m4 be
+it from ST or from some other company (ti, NXP, Atmel, etc) the
+cortex-m4 inside may be the same (or may vary a little) but the rest
+of the chip is from the chip vendor, it can vary widely, even from
+one ST chip to another, you will find particularly with ST but also
+with others, that they may have a few different uart peripherals and
+a few different timers and a few different gpio peripherals and when
+they go to make a new chip they may mix and match the peripherals from
+their existing choices, or may make a new one or modify one.  You may
+find a uart in this chip that matches a uart in another ST chip maybe
+not at the same base address but otherwise identical but this and that
+chip may have different GPIO logic.  Short answer, dont go around
+asking how do I do something with an ARM Cortex-M4 you ask how do
+I do something with an ST STM32F407VGT6, MOST of your code has to
+do with the non ARM portions of the chip, thus most questions you will
+have have to do with the non ARM logic in the chip.
+
+As mentioned I have included a picture of the board I have, and have
+a schematic here that so far matches as well.
+
+Although a moving target see the TOOLCHAIN file for notes on getting
+a toolchain with which to build these examples.  The root directory
+contains a working blinker00.bin file.
+
+Start with the blinker examples.
+
+
 
