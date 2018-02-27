@@ -1,0 +1,166 @@
+
+See the previous level README for schematic and programmers reference
+information.
+
+PE0 on this board has an led.
+
+Just like blinker02 and blinker03 but uses the PLL to multiply the
+external HSE clock to 168MHz.  Read the warning in blinker03 about
+working with clocks in general.  With the stm32 chips we have the boot0
+and boot1 pins to get into a bootloader so that is our get out of jail
+free card.
+
+If you have this chip but not this board, and/or dont have the external
+clock you can still multiply the internal HSI clock, not as accurate
+but still works.  Read the ST docs with respect to the registers used
+in this example.
+
+As a general rule you need to check the flash clocking rules and all
+the peripherals.  Often the flash has a wait state register of some
+sort that you need to modify before making the processor speed faster.
+In this case for this chip there is a single bit we can leave it zero
+for <=24Mhz but have to make it a one for over 24Mhz so that the flash
+can keep up and not feed garbage into the processor (crashing).  Just
+because you get lucky on a lab bench or on one chip, doesnt mean that
+you can overclock your flash on the whole product line.
+
+Likewise as a general rule you need to check the rules for the
+peripherals they often have a max clock rate as well, and a register
+would be used to divide down the processor clock to generate the
+individual peripheral clocks.  We are safe on this specific chip if you
+look at the datasheet (different from the reference manual) it shows
+that fHCLK and fPCLK can operate up to 48Mhz.  Now that doesnt mean
+that you have to, you can certainly divide them down, this may save
+some power and may have other advantages (or disadvantages).  Compiled
+code (or even hand written assembly) cannot sustain peripheral register
+access at the cpu clock rate, so even half that is more than you can
+bang on a peripheral. Something to think about, this example doesnt
+care about power so the peripheral clock divisors are not touched.
+
+Specific to this chip:
+
+GOTTA READ THE MANUAL!!!
+
+fVCO = pllclkin * (PLLN/PLLM)
+
+Ensure that the VCO output frequency is between 100 and 432 MHz.
+
+PLLM the input clock division factor says:
+
+The software has to set these bits correctly to ensure that the VCO
+input frequency ranges from 1 to 2 MHz. It is recommended to select a
+frequency of 2 MHz to limit PLL jitter.
+
+8MHz crystal, so PLLM is 4.
+
+USB requires 48.  Minimum USB clock
+divisor is VCO/2 (PLLQ).  VCO cant be 96 so 144 minimum, 192, etc.
+
+Main system clock divisors VCO/2 or 4 or 6 or 8
+
+VCO output frequency = VCO input frequency × PLLN with 50 ≤ PLLN ≤ 432
+VCO input frequency = PLL input clock frequency / PLLM with 2 ≤ PLLM ≤ 63
+
+(learn to use a spreadsheet, an engineers best friend)
+
+VC0 USBDIV  USB MAIN/2  MAIN/4  MAIN/6  MAIN/8
+96
+144     3   48      72      36      24      18
+192     4   48      96      48      32      24
+240     5   48      120     60      40      30
+288     6   48      144     72      48      36
+336     7   48      168     84      56      42
+384     8   48              96      64      48
+432     9   48             108      72      54
+
+Max main for this chip is 168 so we can max this out at 168 on the
+main as 336/2 and usb if we use it someday is 336/7
+
+8 * (PLLN/4) = 336
+
+PLLN = 168
+
+VCO between 100 and 432, 336, check
+PLLQ between 2 and 16, 7,  check
+PLLP 2,4,6,8,  2, check
+PLLM between 2 and 63, input 2mhz, 4, 2mhz, check check
+USB at 48MHz, check
+MAIN at 168Mhz or less, check
+
+PLLM 4
+PLLN 168
+PLLQ 7
+PLLP 2
+
+And even with all of that correct, what they dont put in the clock
+chatper, the thing that bites you...If you overclock the flash you
+can/will crash, the processor will see corrupt data/instructions.
+
+FLASH wait states, and they go so far here as to chart it by voltage
+range, we can assume 3.3 which for 168 means 5 WS (6 CPU cycles),
+but there are places in the table where we need 7 WS (8 CPU cycles).
+Hmmm...general purpose clock init or board specific assuming this
+board is seeing 3.3V.
+
+On STM32F405xx/07xx and STM32F415xx/17xx devices:
+- when VOS = '0', the maximum value of f HCLK = 144 MHz.
+- when VOS = '1', the maximum value of f HCLK = 168 MHz.
+
+Bit 14 VOS: Regulator voltage scaling output selection
+This bit controls the main internal voltage regulator output voltage to achieve a trade-off
+between performance and power consumption when the device does not operate at the
+maximum frequency.
+0: Scale 2 mode
+1: Scale 1 mode (default value at reset)
+
+Dont skip all these steps you gotta read the manual, even though the
+manual often has bugs, still read it and assume it is right...
+
+So we have VOS = 1 on reset, no need to mess with that.
+
+The FLASH_ACR for this chip gives us not only prefetch control
+and latency but there is an I and D cache that we will no doubt
+play with later.
+
+KEEP READING!!!
+
+Several prescalers are used to configure the AHB frequency, the
+high-speed APB (APB2) and the low-speed APB (APB1) domains. The maximum
+frequency of the AHB domain is 180 MHz. The maximum allowed frequency
+of the high-speed APB2 domain is 90 MHz. The maximum allowed frequency
+of the low-speed APB1 domain is 45 MHz
+
+(note for this chip that 180 is really 168)
+
+
+PPRE2
+Caution: The software has to set these bits correctly not to exceed
+90 MHz on this domain.
+The clocks are divided with the new prescaler factor from 1 to 16 AHB
+cycles after PPRE2 write.
+
+168/90 = 1.86   PPRE2 = 2
+
+PPRE1
+Caution: The software has to set these bits correctly not to exceed
+45 MHz on this domain.
+
+The clocks are divided with the new prescaler factor from 1 to 16 AHB
+cycles after PPRE1 write.
+
+168/45 = 3.7  PPRE1 = 4
+
+
+HPRE
+Caution: The clocks are divided with the new prescaler factor from
+1 to 16 AHB cycles after HPRE write.
+Caution: The AHB clock frequency must be at least 25 MHz when the
+Ethernet is used.
+
+Above assumes AHB of 168 so system clock not divided for AHB.
+
+
+And lastly, if we count to 1 million 336 times per led state change
+that means the led is on for 2 seconds and off for 2 seconds.  Mine
+works, did I just get lucky???
+

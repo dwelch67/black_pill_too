@@ -1,0 +1,10 @@
+
+See the previous level README for schematic and programmers reference
+information.
+
+PE0 on this board has an led.
+
+The processor core has a timer, this uses the timer.  The internal
+clock HSI is 16Mhz, not as accurate as a crystal, but good enough.
+The timer is set to 1mhz timeout, 32 of those is 2 seconds, so the
+led is on 2 seconds then off 2 seconds.

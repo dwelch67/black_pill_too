@@ -1,0 +1,36 @@
+
+See the previous level README for schematic and programmers reference
+information.
+
+PE0 on this board has an led.
+
+This board has an 8MHz external (to the chip) clock (HSE), this is more
+accurate than the internal HSI clock.  This example switches to that
+clock first, then blinks the led on and off for 32 million ticks just
+like blinker02, but the HSI (internal) is 16MHz and the HES (external)
+is 8MHz so 4 seconds on, for seconds off for the led.
+
+
+Note it is often dangerous when messing with the clock configuration,
+despite decades of experience this is one place where you could brick
+the chip.  Should take it slow, good to have a uart setup or some other
+way to see the registers as you go, do one step at a time per
+experiment.  This is how I did it.  Fortunately with the st chips and
+this board we have the boot0 and boot1 pins that gives us an alternate
+boot into the bootloader, so we have a way to get unbricked.  In the
+future you should consider making your own bootstrap, checking a gpio
+pin and dont boot if the pin is pulled one way or the other this way
+you can stop the processor before going into the clock init code.  This
+all depends heavily on the architecture of the core and the chip.
+Some chips the flash can be programmed while the chip/processor core is
+in reset making it always safe.  With cores like this that have a
+jtag/debug interface the vendors often encourage that to be used, but
+if you have switched the chip into a clock that isnt oscillating, then
+coming through the debug interface into a hung processor and/or hung
+chip wont allow you to reprogram it.  Some MCUs have protection to
+prevent you from switching into a dead clock or will switch out of a
+clock that dies back into the internal.  Getting too used to these get
+out of jail free cards will eventually walk you into a bricked
+chip/board someday if you are not a little paraniod and do a little
+bit of extra research first as well as take it slow through the init,
+one step per experiment.

@@ -1,0 +1,15 @@
+
+See the previous level README for schematic and programmers reference
+information.
+
+Interrupts are the LAST way you should learn to blink an led, never
+the first.  This uses SYSTICK which is not quite the whole interrupt
+story, its really an event not an interrupt, more work is required
+to use interrupts (from say one of the timer peripherals).
+
+The prior examples with the PLL were fun, but we dont need to go that
+fast and are not using the USB peripheral, so straight up unmodified
+external clock is best.  8MHz, an interrupt every 1million clocks
+change the led state every 48 interrupts is 6 seconds per led state
+change.
+

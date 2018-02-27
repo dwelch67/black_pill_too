@@ -52,6 +52,12 @@ run our program in flash.
 
 This implies that BOOT0 and BOOT1 float high when not shorted to ground.
 
+If you have a jumper on both BOOT0 and BOOT1 it also boots into your
+application flash.  So if you leave the BOOT1 in place and then put a
+momentary pushbutton on BOOT0 you can hold it and press reset to run
+the application, press reset without BOOT0 and run the bootloader no
+more moving jumpers.
+
 Documents you will need
 
 On the st.com website search for STM32F407VGT6, get the datasheet (currently

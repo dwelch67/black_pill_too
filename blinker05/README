@@ -1,0 +1,47 @@
+
+See the previous level README for schematic and programmers reference
+information.
+
+PE0 on this board has an led.
+
+Read all the warnings and stuff in blinker04/README, this
+is derived from that make USB 48 and the system 48.
+
+PLLM is 4
+
+(learn to use a spreadsheet, an engineers best friend)
+
+VC0 USBDIV  USB MAIN/2  MAIN/4  MAIN/6  MAIN/8
+96
+144     3   48      72      36      24      18
+192     4   48      96      48      32      24
+240     5   48      120     60      40      30
+288     6   48      144     72      48      36
+336     7   48      168     84      56      42
+384     8   48              96      64      48
+432     9   48             108      72      54
+
+If we do a VCO of 192 we can divide that by 4 for USB and for MAIN
+
+8 * (PLLN/4) = 192
+
+PLLN = 96
+
+
+PLLM 4
+PLLN 96
+PLLQ 4
+PLLP 4
+
+PPRE2 <90 not divided
+PPRE1 <45 divide by 2
+HPRE not divided
+
+1 WS aggressive
+2 WS conservative
+
+
+if we count to 1 million 96 times per led state change that means the
+led is on for 2 seconds and off for 2 seconds.
+
+
