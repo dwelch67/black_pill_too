@@ -1,0 +1,6 @@
+
+See the previous level README for schematic and programmers reference
+information.
+
+TIM2 is a 32 bit counter.  clock set to use 8MHz HSE.  If all you do
+is enable the counter, it is a free running counter.
