@@ -112,5 +112,62 @@ contains a working blinker00.bin file.
 
 Start with the blinker examples.
 
+For the uart examples and others that use the uart, you need a
+uart solution.  There are many.  Search for
 
+ftdi breakout
+
+on amazon or ebay or adafruit or sparkfun.  See the FTDI_breakout.jpg
+picture, these are a couple of bucks each on ebay.  Make sure you
+set the jumper/switch to 3.3v.  And TX <-> RX
+
+PA9  USART1_TX to FTDI breakout RX
+PA10 USART1_RX to FTDI breakout TX
+
+There are a myriad of solutions and they dont have to be FTDI they just
+need to be a uart solution at 3.3V TTL levels NOT RS232!!!  And not
+5V and not 1.8V.
+
+I buy bundles of female to female jumper wires, ebay you can get 40 for
+under $2 shipped.  YMMV sparkfun, adafruit, etc have them too.  If you
+get a female breakout board then you may need a male/female jumper wire
+I prefer to stick with one kind where possible.
+
+Learn how to use a dumb terminal program like minicom
+
+Even though there is a warning here is my /etc/minicom/minirc.usb0:
+
+# Machine-generated file - use "minicom -s" to change parameters.
+pu port             /dev/ttyUSB0
+pu minit            
+pu mhangup          
+pu rtscts           No 
+pu sound            No 
+
+Cut and (create and) paste this to minirc.usb1 and usb2 and usb3...
+changing the tthUSB0 to ttyUSB1 and so on.  Saves a lot of time with
+their menu system.
+
+sudo apt-get install minicom lrzsz
+
+May need the zmodem and xmodem at some point not necessarily for this
+repo but for other things.
+
+Once you have one of these setup plug in the usb uart board/cable
+
+Looking for the last line
+
+[499317.633302] usb 2-1.7.4: FTDI USB Serial Device converter now attached to ttyUSB0
+
+which tells me
+
+minicom usb0
+
+with the rc files I created above.  And there you go, defaults to 115200 8N1
+so ready to go.
+
+
+chipinfo example shows this is a cortex-m4 r0p1.  no cache.  single but
+no double precision float.  has both stacks (not that we care the other
+stack is not worth the trouble)
 

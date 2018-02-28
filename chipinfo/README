@@ -1,0 +1,112 @@
+
+See the previous level README for schematic and programmers reference
+information.
+
+//PA9  USART1_TX
+//PA10 USART1_RX
+
+12345678 
+E000ED00 410FC241 CPUID
+E000ED40 00000030 ID_PFR0
+E000ED44 00000200 ID_PFR1
+E000ED48 00100000 ID_DFR0
+E000ED4C 00000000 ID_AFR0
+E000ED50 00100030 ID_MMFR0
+E000ED54 00000000 ID_MMFR1
+E000ED58 01000000 ID_MMFR2
+E000ED5C 00000000 ID_MMFR3
+E000ED60 01101110 ID_ISAR0
+E000ED64 02112000 ID_ISAR1
+E000ED68 21232231 ID_ISAR2
+E000ED6C 01111131 ID_ISAR3
+E000ED70 01310132 ID_ISAR4
+E000ED74 00000000 ID_ISAR5 (reserved)
+E000ED78 00000000 CLIDR
+E000ED7C 00000000 CTR
+E000ED80 00000000 CCSIDR
+E000ED84 00000000 CSSELR
+
+E000EF34 C0000000 FPCCR
+E000EF38 00000000 FPCAR
+E000EF3C 00000000 FPDSCR
+E000EF40 10110021 MVFR0
+E000EF44 11000011 MVFR1
+E000EF48 00000000 MVFR2
+
+E000ED88 00000000 00F00000 
+
+0000000F 
+00BADBAD
+
+E000ED00 410FC241 CPUID
+0x41 ARM
+0x0 processor revision 0
+0xF constant
+0xC24 = cortex-m4
+0x1 patch 1
+
+revision r0p1 so that is the ARM TRM we should be reading.
+
+
+E000ED44 00000200 ID_PFR1
+
+2 = two stack programmers model supported
+
+some cores dont suppor the two stack model, not that we care about
+the second stack pointer.
+
+E000ED58 01000000 ID_MMFR2
+
+1 Support for WFI stalling
+
+Some dont actually stall on a WFI, they may have the instruction for
+completelness but treat it as a nop, this one appears to use it as a
+wait for interrupt.
+
+E000ED78 00000000 CLIDR
+
+no cache!
+
+ST has their own cachy thing, it has a marketing name.  So perhaps
+that is why there isnt one here, or perhaps space or cost, who knows.
+No cache, it is what it is.
+
+
+E000EF40 10110021 MVFR0
+
+Defined as 0x10110221 if double-precision is implemented, otherwise 0x10110021 .
+
+E000EF44 11000011 MVFR1
+
+Defined as 0x12000011 if double-precision is implemented, otherwise 0x11000011 .
+
+E000EF48 00000000 MVFR2
+
+Defined as 0x00000040 if double-precision is implemented, otherwise 0x00000000 .
+
+so this is single precision float
+
+E000ED88 00000000 00F00000 
+
+If a coprocessor is not implemented, a write of 0b01 or 0b11 to the corresponding CPACR
+field reads back as 0b00 .
+
+so both CP10 and CP11 are there, but the MVFR registers imply single
+precision not double.  I guess we have to do some experiments...
+
+0000000F  computes 3 * 5 = 15 in single precision float
+00BADBAD  hardfaults on double
+
+So this is confusing they allow you to set CP11 for double but then
+they dont support double.  Seems like a chip bug.
+
+Change the program to only enable CP10 
+
+E000ED88 00000000 00F00000 
+00F00000 00300000 
+0000000F 
+00BADBAD
+
+and the single precision math still works.
+
+

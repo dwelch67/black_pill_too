@@ -1,0 +1,37 @@
+
+See the previous level README for schematic and programmers reference
+information.
+
+//PA9  USART1_TX
+//PA10 USART1_RX
+
+Output:
+
+12345678 
+00000000 00300000 
+0000000F 
+0000003B 
+12345678
+
+This is more of a build exercise than anything else.  You have to
+enable coprocessor 10, the single precision floating point processor
+in order to use it.  You need to tell the toolchain that these
+instructions are supported, and to avoid libgcc calls
+
+ftest.o: In function `ftest':
+ftest.c:(.text+0x4): undefined reference to `__aeabi_ui2f'
+ftest.c:(.text+0xa): undefined reference to `__aeabi_fmul'
+ftest.c:(.text+0x10): undefined reference to `__aeabi_fmul'
+ftest.c:(.text+0x14): undefined reference to `__aeabi_f2uiz'
+
+you need to specify a hard floating point abi
+
+ftest.c is isolated in a different compile domain to avoid optimization
+removing the floating point instructions.
+
+Maybe one of the manuals I dont read has more/better info but the
+ARM ARM and ARM TRM dont give the whole picture as to what coprocessor
+is what and that you have to turn them on.  The cpuinfo example covers
+an experiment for this chip, but still had to know from experience that
+there was even a coprocessor that needed to be turned on, and then
+where/how to do it.

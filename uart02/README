@@ -1,0 +1,10 @@
+
+See the previous level README for schematic and programmers reference
+information.
+
+//PA9  USART1_TX
+//PA10 USART1_RX
+
+Simple uart example, prints 12345678 then prints whatever bytes
+come in.  115200 8N1
+

@@ -1,0 +1,9 @@
+
+See the previous level README for schematic and programmers reference
+information.
+
+//PA9  USART1_TX
+//PA10 USART1_RX
+
+Simple uart example, prints 01234567012345... as fast as it can.
+115200 8N1
