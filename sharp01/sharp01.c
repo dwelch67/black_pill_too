@@ -24,7 +24,6 @@ void dummy ( unsigned int );
 #define SPI_MOSI_ON  ( PUT32(GPIOA_BSRR,1<<(MOSI+ 0)) )
 #define SPI_MOSI_OFF ( PUT32(GPIOA_BSRR,1<<(MOSI+16)) )
 
-
 static void spi_delay ( void )
 {
     //unsigned short ra;
@@ -77,7 +76,7 @@ int notmain ( void )
     unsigned int ra;
     unsigned int rb;
 
-    unsigned int d;
+    //unsigned int d;
 
     ra=GET32(RCC_AHB1ENR);
     ra|=1<<0; //enable port a
