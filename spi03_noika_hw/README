@@ -1,0 +1,29 @@
+
+See the previous level README for schematic and programmers reference
+information.
+
+I normally bit bang spi, this example uses the spi peripheral.
+
+
+I have one of these
+
+https://www.sparkfun.com/products/10168
+http://www.adafruit.com/products/338
+
+Can get them on ebay for much less, but can take a while to get here.
+
+STM32 to Nokia 5110 display connections
+
+PA7 DIN
+PA5 CLK
+PA4 CE
+PA3 D/C
+GND GND
+VCC VCC
+RST RST
+
+I typically dont use the spi controller in these devices as it varies
+so much from vendor to vendor or chip to chip.  But the docs were
+pretty good and I had figured out a similar STM32 one by blinking
+leds and having a huge divisor.
+
