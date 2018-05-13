@@ -1,0 +1,29 @@
+
+Simple seven segment display board, common cathode.
+
+Looking at the display, 8 pins on the left
+
+0 PE0
+1 PE1
+2 PE2
+3 PE3
+4 PE4
+5 PE5
+6 PE6
+7 PE7
+
+right side is the grounds from the top
+
+0 PA0
+1 PA1
+2 PA2
+3 PA3
+
+
+Specifically I used these parts
+
+HDSP-513G (green)
+HDSP-513E (red)
+
+I used 750Ohm resistors, I didnt want this too bright, built one with
+130ohm to be a little brighter for a lit room.
