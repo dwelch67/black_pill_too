@@ -318,6 +318,7 @@ static int do_nmea ( void )
                 if(savesum==xsum)
                 {
                     num[0]=xstring[0]&0xF;
+                    if(num[0]!=1) num[0]=10;
                     num[1]=xstring[1]&0xF;
                     num[2]=xstring[2]&0xF;
                     num[3]=xstring[3]&0xF;
